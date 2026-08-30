@@ -1,0 +1,11 @@
+[repository]
+name = "hyprwinsnap"
+authors = ["quy"]
+
+[hyprwinsnap]
+description = "Snap floating window sizes to configurable presets while resizing"
+authors = ["quy"]
+output = "hyprwinsnap.so"
+build = [
+    "make all"
+]
