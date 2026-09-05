@@ -10,10 +10,11 @@ stay in place, so the window snaps around whatever corner you grabbed.
 ## Build
 
 ```sh
-make
+meson setup build --buildtype=release
+ninja -C build
 ```
 
-Produces `hyprwinsnap.so`.
+Produces `build/hyprwinsnap.so`.
 
 ## Install
 
