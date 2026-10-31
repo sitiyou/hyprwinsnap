@@ -41,7 +41,7 @@
 #include <src/output/Monitor.hpp>
 #include <src/desktop/DesktopTypes.hpp>
 #include <src/desktop/view/View.hpp>
-#include <src/desktop/view/Window.hpp>
+#include <src/desktop/view/window/Window.hpp>
 #include <src/config/values/types/BoolValue.hpp>
 #include <src/config/values/types/IntValue.hpp>
 #include <src/config/values/types/StringValue.hpp>
@@ -122,8 +122,7 @@ static std::vector<SPreset> parsePresets(std::string_view raw) {
 
         const auto xSep = item.find_first_of("xX", b);
         if (xSep == std::string_view::npos || xSep == e - 1) {
-            Log::logger->log(Log::WARN, "hyprwinsnap: ignoring malformed preset '{}' (expected WxH)",
-                             item.substr(b, e - b));
+            LOG(Log::WARN, "hyprwinsnap: ignoring malformed preset '{}' (expected WxH)", item.substr(b, e - b));
             continue;
         }
 
@@ -131,8 +130,7 @@ static std::vector<SPreset> parsePresets(std::string_view raw) {
         const double h = parseDim(item.substr(xSep + 1, e - xSep - 1));
 
         if (w <= 0 || h <= 0) {
-            Log::logger->log(Log::WARN, "hyprwinsnap: ignoring malformed preset '{}' (expected positive WxH)",
-                             item.substr(b, e - b));
+            LOG(Log::WARN, "hyprwinsnap: ignoring malformed preset '{}' (expected positive WxH)", item.substr(b, e - b));
             continue;
         }
 
@@ -228,7 +226,7 @@ static void applySizeSnap(CBox& box, eRectCorner corner, eMouseBindMode mode, co
         box.y = old.y;
 
     if (cfgDebug->value())
-        Log::logger->log(Log::DEBUG, "hyprwinsnap: snapped {}x{} -> {}x{}", old.w, old.h, box.w, box.h);
+        LOG(Log::DEBUG, "hyprwinsnap: snapped {}x{} -> {}x{}", old.w, old.h, box.w, box.h);
 }
 
 // ---------------------------------------------------------------------------
@@ -311,7 +309,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
                             HyprlandAPI::addConfigValueV2(PHANDLE, cfgPresets) &&
                             HyprlandAPI::addConfigValueV2(PHANDLE, cfgDebug);
     if (!registered)
-        Log::logger->log(Log::ERR, "hyprwinsnap: failed to register config values");
+        LOG(Log::ERR, "hyprwinsnap: failed to register config values");
 
     static const auto methods = HyprlandAPI::findFunctionsByName(PHANDLE, "setPositionGlobal");
     for (const auto& m : methods) {
@@ -323,11 +321,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
         g_pSetPosHook =
             HyprlandAPI::createFunctionHook(handle, m.address, reinterpret_cast<void*>(&hkSetPositionGlobal));
         if (g_pSetPosHook && g_pSetPosHook->hook()) {
-            Log::logger->log(Log::INFO, "hyprwinsnap: hooked ITarget::setPositionGlobal");
+            LOG(Log::INFO, "hyprwinsnap: hooked ITarget::setPositionGlobal");
             break;
         }
 
-        Log::logger->log(Log::ERR, "hyprwinsnap: failed to hook setPositionGlobal");
+        LOG(Log::ERR, "hyprwinsnap: failed to hook setPositionGlobal");
         break;
     }
 
